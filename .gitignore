@@ -1,0 +1,49 @@
+# Ignorowanie plików wygenerowanych przez IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Ignorowanie konfiguracji systemu operacyjnego
+.DS_Store
+Thumbs.db
+
+# Ignorowanie kompilowanych plików klas Java
+out/
+target/
+bin/
+build/
+
+# Ignorowanie logów
+*.log
+
+# Ignorowanie katalogu maven
+.mvn/
+**/target/
+
+# Ignorowanie plików Gradle
+.gradle/
+build/
+
+# Ignorowanie plików IDE
+*.class
+*.project
+*.classpath
+
+# Ignorowanie plików konfiguracji IDE
+.nb-gradle/
+.nb-configuration/
+.vscode/
+
+# Ignorowanie plików systemu kontroli wersji
+.svn/
+.hg/
+.git/
+
+# Ignorowanie tymczasowych plików backupu
+*.bak
+*.swp
+*.tmp
+
+# Ignorowanie bibliotek pobranych zewnętrznie
+lib/
