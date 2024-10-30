@@ -6,6 +6,7 @@ import pl.edu.agh.iisg.to.dao.StudentDao;
 import pl.edu.agh.iisg.to.model.Course;
 import pl.edu.agh.iisg.to.model.Grade;
 import pl.edu.agh.iisg.to.model.Student;
+import pl.edu.agh.iisg.to.repository.StudentRepository;
 import pl.edu.agh.iisg.to.session.TransactionService;
 
 import java.util.*;
@@ -20,11 +21,15 @@ public class SchoolService {
 
     private final GradeDao gradeDao;
 
-    public SchoolService(TransactionService transactionService, StudentDao studentDao, CourseDao courseDao, GradeDao gradeDao) {
+    private final StudentRepository studentRepository;
+
+    public SchoolService(TransactionService transactionService, StudentDao studentDao, CourseDao courseDao, GradeDao gradeDao,
+                         StudentRepository studentRepository) {
         this.transactionService = transactionService;
         this.studentDao = studentDao;
         this.courseDao = courseDao;
         this.gradeDao = gradeDao;
+        this.studentRepository = studentRepository;
     }
 
     public boolean enrollStudent(final Course course, final Student student) {
@@ -39,21 +44,13 @@ public class SchoolService {
         }).orElse(false);
     }
 
-    public boolean removeStudent(int indexNumber) {
+    public void removeStudent(int indexNumber) {
         // TODO - implement
-        return transactionService.doAsTransaction(() -> {
+        transactionService.doAsTransaction(() -> {
             Optional<Student> studentOptional = studentDao.findByIndexNumber(indexNumber);
-
-            if (studentOptional.isPresent()) {
-                for(Course course: studentOptional.get().courseSet()) {
-                    course.studentSet().remove(studentOptional.get());
-                }
-                studentDao.remove(studentOptional.get());
-                return true;
-            } else {
-                return false;
-            }
-        }).orElse(false);
+            studentRepository.remove(studentOptional.get());
+            return null;
+        });
     }
 
     public boolean gradeStudent(final Student student, final Course course, final float gradeValue) {
@@ -69,21 +66,15 @@ public class SchoolService {
 
     public Map<String, List<Float>> getStudentGrades(String courseName) {
         // TODO - implement
-        Optional<Course> course = courseDao.findByName(courseName);
-
-        if (course.isPresent()) {
-            Map<String, List<Float>> grades = new HashMap<>();
-
-            for (Student s : course.get().studentSet()) {
-                List<Float> gradesList = course.get().gradeSet().stream()
-                        .filter(grade -> grade.student().equals(s))
-                        .map(Grade::grade)
-                        .sorted()
-                        .toList();
-                grades.put(s.fullName(), gradesList);
-            }
-            return grades;
+        List<Student> students = studentRepository.findAllByCourseName(courseName);
+        if (students.isEmpty()) {
+            return Collections.emptyMap();
         }
-        return Collections.emptyMap();
+
+        Map<String, List<Float>> grades = new HashMap<>();
+        for (Student s : students) {
+            grades.put(s.fullName(), s.gradeSet().stream().map(Grade::grade).toList());
+        }
+        return grades;
     }
 }

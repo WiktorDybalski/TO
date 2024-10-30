@@ -23,8 +23,7 @@ public class StudentDao extends GenericDao<Student> {
     public List<Student> findAll() {
         // TODO - implement
         try {
-            Session session = currentSession();
-            return session.createQuery("SELECT s from Student s ORDER BY s.lastName", Student.class)
+            return currentSession().createQuery("SELECT s from Student s ORDER BY s.lastName", Student.class)
                     .getResultList();
         } catch (PersistenceException e) {
             e.printStackTrace();
@@ -35,8 +34,7 @@ public class StudentDao extends GenericDao<Student> {
     public Optional<Student> findByIndexNumber(final int indexNumber) {
         // TODO - implement
         try {
-            Session session = currentSession();
-            return session.createQuery("SELECT s FROM Student s WHERE s.indexNumber = :indexNumber", Student.class)
+            return currentSession().createQuery("SELECT s FROM Student s WHERE s.indexNumber = :indexNumber", Student.class)
                     .setParameter("indexNumber", indexNumber)
                     .uniqueResultOptional();
         } catch (PersistenceException e) {

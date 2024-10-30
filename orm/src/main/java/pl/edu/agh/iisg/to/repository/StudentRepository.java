@@ -1,5 +1,8 @@
 package pl.edu.agh.iisg.to.repository;
 
+import pl.edu.agh.iisg.to.dao.CourseDao;
+import pl.edu.agh.iisg.to.dao.StudentDao;
+import pl.edu.agh.iisg.to.model.Course;
 import pl.edu.agh.iisg.to.model.Student;
 
 import java.util.Collections;
@@ -8,27 +11,43 @@ import java.util.Optional;
 
 public class StudentRepository implements Repository<Student> {
 
+    private StudentDao studentDao;
+    private CourseDao courseDao;
+
+    public StudentRepository(StudentDao studentDao, CourseDao courseDao) {
+        this.studentDao = studentDao;
+        this.courseDao = courseDao;
+    }
+
     @Override
     public Optional<Student> add(Student student) {
-        return Optional.empty();
+        return studentDao.create(student.firstName(), student.lastName(), student.indexNumber());
     }
 
     @Override
-    public Optional getById(int id) {
-        return Optional.empty();
+    public Optional<Student> getById(int id) {
+        return studentDao.findById(id);
     }
 
     @Override
-    public List findAll() {
-        return List.of();
+    public List<Student> findAll() {
+        return studentDao.findAll();
     }
 
     @Override
     public void remove(Student student) {
+        Optional<Student> studentOptional = Optional.ofNullable(student);
 
+        if (studentOptional.isPresent()) {
+            for (Course course : studentOptional.get().courseSet()) {
+                course.studentSet().remove(studentOptional.get());
+            }
+            studentDao.remove(studentOptional.get());
+        }
     }
 
     public List<Student> findAllByCourseName(String courseName) {
-        return Collections.emptyList();
+        Optional<Course> courseOptional = courseDao.findByName(courseName);
+        return courseOptional.map(course -> course.studentSet().stream().toList()).orElse(Collections.emptyList());
     }
 }

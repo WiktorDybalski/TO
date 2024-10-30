@@ -9,6 +9,7 @@ import pl.edu.agh.iisg.to.dao.GradeDao;
 import pl.edu.agh.iisg.to.dao.StudentDao;
 import pl.edu.agh.iisg.to.model.Course;
 import pl.edu.agh.iisg.to.model.Student;
+import pl.edu.agh.iisg.to.repository.StudentRepository;
 import pl.edu.agh.iisg.to.service.SchoolService;
 import pl.edu.agh.iisg.to.session.SessionService;
 
@@ -31,7 +32,9 @@ public class OrmTest {
 
     private final GradeDao gradeDao = new GradeDao(sessionService);
 
-    private final SchoolService schoolService = new SchoolService(sessionService, studentDao, courseDao, gradeDao);
+    private final StudentRepository studentRepository = new StudentRepository(studentDao, courseDao);
+
+    private final SchoolService schoolService = new SchoolService(sessionService, studentDao, courseDao, gradeDao, studentRepository);
 
     @BeforeEach
     public void before() {
