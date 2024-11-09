@@ -1,6 +1,11 @@
 package command;
 
-public class AddTransationCommand implements Command{
+import model.Account;
+import model.Transaction;
+
+public class AddTransactionCommand implements Command {
+    private Transaction transactionToAdd;
+    private Account account;
 
     public AddTransactionCommand(Transaction transactionToAdd, Account account) {
         this.transactionToAdd = transactionToAdd;
@@ -9,11 +14,21 @@ public class AddTransationCommand implements Command{
 
     @Override
     public void execute() {
-
+        account.addTransaction(transactionToAdd);
     }
 
     @Override
     public String getName() {
         return "New transaction: " + transactionToAdd.toString();
+    }
+
+    @Override
+    public void undo() {
+        account.removeTransaction(transactionToAdd);
+    }
+
+    @Override
+    public void redo() {
+        account.addTransaction(transactionToAdd);
     }
 }
